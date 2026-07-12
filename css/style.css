@@ -22,7 +22,12 @@ html, body {
   * { box-sizing: border-box; }
   #root {
     font-family: 'IBM Plex Sans', system-ui, -apple-system, Segoe UI, sans-serif;
-    background: var(--bg);
+    background-color: var(--bg);
+    background-image: url('page-bg.jpg');
+    background-size: cover;
+    background-position: center top;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
     color: var(--text);
     min-height: 100%;
     padding: 28px 20px 110px;
