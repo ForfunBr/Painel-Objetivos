@@ -56,6 +56,7 @@
   }
 
   async function load() {
+    let hasStoredData = false;
     try {
       const res = await window.storage.get(STORAGE_KEY, false);
       const parsed = res && res.value ? JSON.parse(res.value) : null;
@@ -64,10 +65,12 @@
         objectives = parsed;
         score = INITIAL_SCORE;
         scoreHistory = [];
+        hasStoredData = true;
       } else if (parsed) {
         objectives = parsed.objectives || [];
         score = typeof parsed.score === 'number' ? parsed.score : INITIAL_SCORE;
         scoreHistory = Array.isArray(parsed.history) ? parsed.history : [];
+        hasStoredData = true;
       } else {
         objectives = [];
         score = INITIAL_SCORE;
@@ -78,6 +81,11 @@
       score = INITIAL_SCORE;
       scoreHistory = [];
     }
+
+    if (!hasStoredData) {
+      await tryAutoLoadFromRepo();
+    }
+
     ready = true;
     document.getElementById('subtitleText').textContent = 'carregue ou salve sua planilha Excel para manter os dados';
     applyAutoPenalties();
@@ -860,68 +868,92 @@
     setStatus('baixado (' + count + ' itens) — verifique a pasta Downloads do navegador');
   }
 
+  function stateFromWorkbook(wb) {
+    const sheet = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+    const newObjectives = rows
+      .filter(r => (r['Tarefa'] || '').toString().trim().length > 0)
+      .map(r => {
+        const createdRaw = r['Criado em'];
+        const parsed = createdRaw ? Date.parse(createdRaw) : NaN;
+        const prazoRaw = (r['Prazo'] || '').toString().trim();
+        const completedRaw = r['Concluído em'];
+        const completedParsed = completedRaw ? Date.parse(completedRaw) : NaN;
+        const isDone = String(r['Concluída'] || '').trim().toLowerCase() === 'sim';
+        return {
+          id: uid(),
+          category: catLabelToKey(r['Categoria']),
+          text: (r['Tarefa'] || '').toString().trim(),
+          done: isDone,
+          createdAt: isNaN(parsed) ? Date.now() : parsed,
+          dueDate: prazoRaw || null,
+          priority: priorityLabelToKey(r['Prioridade']),
+          completedAt: isDone ? (isNaN(completedParsed) ? (isNaN(parsed) ? Date.now() : parsed) : completedParsed) : null,
+          failed: String(r['Não cumprido'] || '').trim().toLowerCase() === 'sim',
+          autoPenalized: String(r['Penalizado automaticamente'] || '').trim().toLowerCase() === 'sim',
+        };
+      });
+
+    let newScore = INITIAL_SCORE;
+    const scoreSheet = wb.Sheets['Pontuacao'];
+    if (scoreSheet) {
+      const scoreRows = XLSX.utils.sheet_to_json(scoreSheet, { defval: '' });
+      if (scoreRows.length && typeof scoreRows[0]['Saldo Atual'] === 'number') {
+        newScore = scoreRows[0]['Saldo Atual'];
+      }
+    }
+
+    let newHistory = [];
+    const historySheet = wb.Sheets['Historico'];
+    if (historySheet) {
+      const historyRows = XLSX.utils.sheet_to_json(historySheet, { defval: '' });
+      newHistory = historyRows
+        .filter(h => h['Motivo'])
+        .map(h => {
+          const ts = Date.parse(h['Data']);
+          return {
+            id: uid(),
+            timestamp: isNaN(ts) ? Date.now() : ts,
+            delta: typeof h['Variação'] === 'number' ? h['Variação'] : 0,
+            reason: String(h['Motivo'] || ''),
+            balance: typeof h['Saldo após'] === 'number' ? h['Saldo após'] : newScore,
+          };
+        });
+    }
+
+    return { objectives: newObjectives, score: newScore, history: newHistory };
+  }
+
+  const REPO_EXCEL_FILENAME = 'Objetivos.xlsx';
+
+  async function tryAutoLoadFromRepo() {
+    try {
+      const resp = await fetch(REPO_EXCEL_FILENAME, { cache: 'no-store' });
+      if (!resp.ok) return false;
+      const buffer = await resp.arrayBuffer();
+      const wb = XLSX.read(new Uint8Array(buffer), { type: 'array' });
+      const parsed = stateFromWorkbook(wb);
+      objectives = parsed.objectives;
+      score = parsed.score;
+      scoreHistory = parsed.history;
+      setStatus('planilha do repositório carregada automaticamente (' + objectives.length + ' itens, ' + score + ' pts)');
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   function importFromExcelFile(file) {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
         const data = new Uint8Array(e.target.result);
         const wb = XLSX.read(data, { type: 'array' });
-        const sheet = wb.Sheets[wb.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
-
-        objectives = rows
-          .filter(r => (r['Tarefa'] || '').toString().trim().length > 0)
-          .map(r => {
-            const createdRaw = r['Criado em'];
-            const parsed = createdRaw ? Date.parse(createdRaw) : NaN;
-            const prazoRaw = (r['Prazo'] || '').toString().trim();
-            const completedRaw = r['Concluído em'];
-            const completedParsed = completedRaw ? Date.parse(completedRaw) : NaN;
-            const isDone = String(r['Concluída'] || '').trim().toLowerCase() === 'sim';
-            return {
-              id: uid(),
-              category: catLabelToKey(r['Categoria']),
-              text: (r['Tarefa'] || '').toString().trim(),
-              done: isDone,
-              createdAt: isNaN(parsed) ? Date.now() : parsed,
-              dueDate: prazoRaw || null,
-              priority: priorityLabelToKey(r['Prioridade']),
-              completedAt: isDone ? (isNaN(completedParsed) ? (isNaN(parsed) ? Date.now() : parsed) : completedParsed) : null,
-              failed: String(r['Não cumprido'] || '').trim().toLowerCase() === 'sim',
-              autoPenalized: String(r['Penalizado automaticamente'] || '').trim().toLowerCase() === 'sim',
-            };
-          });
-
-        const scoreSheet = wb.Sheets['Pontuacao'];
-        if (scoreSheet) {
-          const scoreRows = XLSX.utils.sheet_to_json(scoreSheet, { defval: '' });
-          if (scoreRows.length && typeof scoreRows[0]['Saldo Atual'] === 'number') {
-            score = scoreRows[0]['Saldo Atual'];
-          } else {
-            score = INITIAL_SCORE;
-          }
-        } else {
-          score = INITIAL_SCORE;
-        }
-
-        const historySheet = wb.Sheets['Historico'];
-        if (historySheet) {
-          const historyRows = XLSX.utils.sheet_to_json(historySheet, { defval: '' });
-          scoreHistory = historyRows
-            .filter(h => h['Motivo'])
-            .map(h => {
-              const ts = Date.parse(h['Data']);
-              return {
-                id: uid(),
-                timestamp: isNaN(ts) ? Date.now() : ts,
-                delta: typeof h['Variação'] === 'number' ? h['Variação'] : 0,
-                reason: String(h['Motivo'] || ''),
-                balance: typeof h['Saldo após'] === 'number' ? h['Saldo após'] : score,
-              };
-            });
-        } else {
-          scoreHistory = [];
-        }
+        const parsed = stateFromWorkbook(wb);
+        objectives = parsed.objectives;
+        score = parsed.score;
+        scoreHistory = parsed.history;
 
         save();
         render();
