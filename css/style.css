@@ -23,7 +23,7 @@ html, body {
   #root {
     font-family: 'IBM Plex Sans', system-ui, -apple-system, Segoe UI, sans-serif;
     background-color: var(--bg);
-    background-image: url('page-bg.jpg');
+    background-image: url('../page-bg.jpg');
     background-size: cover;
     background-position: center top;
     background-attachment: fixed;
