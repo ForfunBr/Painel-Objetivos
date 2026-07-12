@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Objetivos - Pontuação</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="root">
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <div class="title">Painel de <span>Objetivos</span></div>
+        <div class="subtitle" id="subtitleText">carregando...</div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" data-page="objetivos">OBJETIVOS</div>
+        <div class="tab" data-page="resumo">RESUMO</div>
+        <div class="tab" data-page="score">SCORE</div>
+      </div>
+    </div>
+
+    <div class="score-banner">
+      <div>
+        <div class="score-label">Pontuação</div>
+        <div class="score-value" id="scoreValue">1000</div>
+      </div>
+      <div class="score-delta-row">
+        <div class="score-badge" id="scoreDoneBadge">0 concluídos</div>
+        <div class="score-badge" id="scoreFailedBadge">0 não cumpridos</div>
+      </div>
+    </div>
+
+    <div class="excel-row">
+      <label class="excel-btn primary" id="importBtn">
+        ⬆ Carregar do Excel
+        <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none;">
+      </label>
+      <div class="excel-btn" id="exportBtn">⬇ Salvar offline</div>
+      <div class="excel-status" id="excelStatus">nenhum arquivo carregado ainda</div>
+    </div>
+
+    <div class="page active" id="page-objetivos">
+      <div id="sectionsHost"></div>
+
+      <div class="fab-container">
+        <div class="fab-popup" id="fabPopup">
+          <div class="fab-popup-head">
+            <div class="fab-popup-title">Novo objetivo</div>
+            <div class="fab-close" id="fabClose">✕</div>
+          </div>
+          <select class="fab-field" id="fabCategory"></select>
+          <input class="fab-field" type="text" id="fabText" placeholder="Descreva o objetivo...">
+          <input class="fab-field" type="date" id="fabDate" style="display:none;" title="Prazo de conclusão">
+          <select class="fab-field" id="fabPriority"></select>
+          <button class="fab-add-btn" id="fabAddBtn">+ Adicionar</button>
+        </div>
+        <div class="fab-btn" id="fabBtn">+</div>
+      </div>
+    </div>
+
+    <div class="page" id="page-resumo">
+      <div class="master-card">
+        <div class="master-top">
+          <div class="master-num" id="masterNum">0 <span>/ 0 concluídas</span></div>
+          <div class="stat-label" id="masterPct">0%</div>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="masterFill" style="width:0%"></div></div>
+      </div>
+
+      <div class="summary-grid" id="summaryGrid"></div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title">Objetivos concluídos por mês</div>
+          <div class="chart-controls">
+            <select class="year-select" id="chartYearSelect"></select>
+            <div class="chart-legend" id="chartLegend"></div>
+          </div>
+        </div>
+        <div class="chart-host" id="monthChart"></div>
+        <div class="empty-hint" id="chartEmptyHint" style="display:none;">Nenhum objetivo concluído ainda para exibir no gráfico.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title">Tarefas concluídas</div>
+          <div class="count-tag" id="doneCountTag">0 itens</div>
+        </div>
+        <table class="sheet">
+          <thead>
+            <tr><th>Categoria</th><th>Tarefa</th><th>Prioridade</th><th>Prazo</th><th>Status</th></tr>
+          </thead>
+          <tbody id="doneTableBody"></tbody>
+        </table>
+        <div class="empty-hint" id="doneEmptyHint" style="display:none;">Nenhuma tarefa concluída ainda. Marque itens na aba Objetivos.</div>
+      </div>
+    </div>
+
+    <div class="page" id="page-score">
+      <div class="score-mega-card">
+        <div class="score-label">Pontuação atual</div>
+        <div class="score-mega-value" id="scoreMegaValue">1000</div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title">Últimas alterações</div>
+        </div>
+        <div id="historyList"></div>
+        <div class="empty-hint" id="historyEmptyHint" style="display:none;">Nenhuma alteração de pontuação registrada ainda.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title">Variação da pontuação ao longo do tempo</div>
+        </div>
+        <div class="score-chart-wrap">
+          <div id="scoreYAxis"></div>
+          <div id="scoreLineChartHost" class="score-chart-scroll"></div>
+        </div>
+        <div class="empty-hint" id="scoreChartEmptyHint" style="display:none;">Ainda não há histórico suficiente para exibir o gráfico.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
