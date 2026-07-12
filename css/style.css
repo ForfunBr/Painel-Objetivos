@@ -2,22 +2,22 @@ html, body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  background: #14171a;
+  background: #10121f;
 }
 
 :root {
-    --bg: #14171a;
-    --panel: #1d2226;
-    --panel-2: #23282d;
-    --line: #33393f;
-    --text: #e9e7e1;
-    --muted: #9aa0a6;
-    --amber: #e8a33d;
-    --teal: #4fb3a9;
-    --danger: #c9605a;
-    --yellow: #d9b93d;
-    --blue: #5b93d6;
-    --green: #5fb56a;
+    --bg: #10121f;
+    --panel: #1a1d35;
+    --panel-2: #212446;
+    --line: #33375e;
+    --text: #e7e7f5;
+    --muted: #9498bf;
+    --amber: #8b7cf6;
+    --teal: #4fc3d9;
+    --danger: #e0607a;
+    --yellow: #d4c15a;
+    --blue: #6ea8fe;
+    --green: #4fd18b;
   }
   * { box-sizing: border-box; }
   #root {
@@ -25,17 +25,45 @@ html, body {
     background: var(--bg);
     color: var(--text);
     min-height: 100%;
-    padding: 28px 20px 60px;
+    padding: 28px 20px 110px;
   }
   .wrap { max-width: 920px; margin: 0 auto; }
 
   .top {
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
     margin-bottom: 22px;
-    flex-wrap: wrap;
-    gap: 12px;
+    gap: 8px;
+  }
+  .header-banner {
+    width: 100%;
+    max-width: 720px;
+    height: auto;
+    border-radius: 14px;
+    cursor: pointer;
+    display: block;
+    transition: opacity .15s ease, transform .15s ease;
+  }
+  .header-banner:hover { opacity: 0.92; transform: scale(1.005); }
+
+  .bottom-tabs {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 6px;
+    display: flex;
+    gap: 6px;
+    z-index: 60;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+  }
+  .bottom-tabs .tab {
+    padding: 10px 22px;
+    font-size: 14px;
   }
   .title {
     font-family: 'Space Grotesk', 'IBM Plex Sans', sans-serif;
@@ -65,7 +93,7 @@ html, body {
     transition: all .15s ease;
     font-family: 'IBM Plex Mono', monospace;
   }
-  .tab.active { background: var(--amber); color: #1a1300; }
+  .tab.active { background: var(--amber); color: #17142c; }
   .tab:not(.active):hover { color: var(--text); }
 
   .page { display: none; }
@@ -214,7 +242,7 @@ html, body {
     cursor: pointer;
     user-select: none;
   }
-  .sort-opt.active { background: var(--amber); color: #1a1300; font-weight: 600; }
+  .sort-opt.active { background: var(--amber); color: #17142c; font-weight: 600; }
   .sort-opt:not(.active):hover { color: var(--text); }
 
   .del-btn {
@@ -313,7 +341,7 @@ html, body {
   .add-row input:focus { border-color: var(--amber); }
   .add-row button {
     background: var(--amber);
-    color: #1a1300;
+    color: #17142c;
     border: none;
     border-radius: 8px;
     padding: 0 16px;
@@ -490,13 +518,38 @@ html, body {
     background: linear-gradient(135deg, var(--panel), var(--panel-2));
     border: 1px solid var(--line);
     border-radius: 14px;
-    padding: 18px 24px;
+    padding: 66px 24px 50px;
     margin-bottom: 20px;
+    position: relative;
+    min-height: 160px;
+  }
+  .score-corner-btn {
+    position: absolute;
+    top: 16px;
+    width: 150px;
+    cursor: pointer;
+    transition: transform .15s ease, opacity .15s ease;
+  }
+  .score-corner-btn:hover { transform: scale(1.03); opacity: 0.92; }
+  .score-corner-btn img { width: 100%; height: auto; display: block; }
+  .score-corner-left { left: 16px; }
+  .score-corner-right { right: 16px; }
+
+  .score-banner-center {
     display: flex;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .score-bottom-row {
+    position: absolute;
+    bottom: 16px;
+    left: 24px;
+    right: 24px;
+    display: flex;
     justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
+    gap: 16px;
   }
   .score-label {
     font-family: 'IBM Plex Mono', monospace;
@@ -641,7 +694,7 @@ html, body {
     height: 54px;
     border-radius: 50%;
     background: var(--amber);
-    color: #1a1300;
+    color: #17142c;
     font-size: 26px;
     font-weight: 600;
     display: flex;
@@ -703,7 +756,7 @@ html, body {
 
   .fab-add-btn {
     background: var(--amber);
-    color: #1a1300;
+    color: #17142c;
     border: none;
     border-radius: 8px;
     padding: 10px;
@@ -738,9 +791,10 @@ html, body {
   }
   .excel-btn:hover { border-color: var(--teal); color: var(--teal); }
   .excel-btn.primary { border-color: var(--amber); color: var(--amber); }
-  .excel-btn.primary:hover { background: var(--amber); color: #1a1300; }
+  .excel-btn.primary:hover { background: var(--amber); color: #17142c; }
   .excel-status {
     font-size: 12px;
     color: var(--muted);
     font-family: 'IBM Plex Mono', monospace;
+    margin-top: 8px;
   }

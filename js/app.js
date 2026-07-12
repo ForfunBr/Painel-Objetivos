@@ -1,8 +1,8 @@
 (function() {
   const CATEGORIES = [
-    { key: 'gerais', label: 'Objetivos Gerais', color: '#e8a33d' },
-    { key: 'proximos', label: 'Objetivos Próximos', color: '#4fb3a9' },
-    { key: 'medio_longo', label: 'Objetivos a Médio e Longo Prazo', color: '#c9605a' },
+    { key: 'gerais', label: 'Objetivos Gerais', color: '#8b7cf6' },
+    { key: 'proximos', label: 'Objetivos Próximos', color: '#4fc3d9' },
+    { key: 'medio_longo', label: 'Objetivos a Médio e Longo Prazo', color: '#e0607a' },
   ];
   const PRIORITIES = [
     { key: 'urgente', label: 'Urgente' },
@@ -1041,17 +1041,23 @@
     e.target.value = '';
   };
 
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.onclick = () => {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById('page-' + tab.dataset.page).classList.add('active');
+  function switchToTab(pageName) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const targetTab = document.querySelector('.tab[data-page="' + pageName + '"]');
+    if (targetTab) targetTab.classList.add('active');
+    const targetPage = document.getElementById('page-' + pageName);
+    if (targetPage) targetPage.classList.add('active');
 
-      const banner = document.querySelector('.score-banner');
-      if (banner) banner.style.display = tab.dataset.page === 'score' ? 'none' : 'flex';
-    };
+    const banner = document.querySelector('.score-banner');
+    if (banner) banner.style.display = pageName === 'score' ? 'none' : 'flex';
+  }
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.onclick = () => switchToTab(tab.dataset.page);
   });
+
+  document.getElementById('headerBanner').onclick = () => switchToTab('objetivos');
 
   load();
 })();

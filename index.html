@@ -10,35 +10,36 @@
 <div id="root">
   <div class="wrap">
     <div class="top">
-      <div>
-        <div class="title">Painel de <span>Objetivos</span></div>
-        <div class="subtitle" id="subtitleText">carregando...</div>
-      </div>
-      <div class="tabs">
-        <div class="tab active" data-page="objetivos">OBJETIVOS</div>
-        <div class="tab" data-page="resumo">RESUMO</div>
-        <div class="tab" data-page="score">SCORE</div>
-      </div>
+      <img src="banner.jpg" alt="Painel de Objetivos" class="header-banner" id="headerBanner" title="Voltar para Objetivos">
+      <div class="subtitle" id="subtitleText">carregando...</div>
+    </div>
+
+    <div class="bottom-tabs">
+      <div class="tab active" data-page="objetivos">OBJETIVOS</div>
+      <div class="tab" data-page="resumo">RESUMO</div>
+      <div class="tab" data-page="score">SCORE</div>
     </div>
 
     <div class="score-banner">
-      <div>
-        <div class="score-label">Pontuação</div>
-        <div class="score-value" id="scoreValue">1000</div>
+      <label class="score-corner-btn score-corner-left" id="importBtn" title="Carregar do Excel">
+        <img src="upload-btn.png" alt="Carregar do Excel">
+        <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none;">
+      </label>
+
+      <div class="score-corner-btn score-corner-right" id="exportBtn" title="Salvar offline">
+        <img src="download-btn.png" alt="Salvar offline">
       </div>
-      <div class="score-delta-row">
+
+      <div class="score-banner-center">
+        <div class="score-label">Pontuação Atual</div>
+        <div class="score-value" id="scoreValue">1000</div>
+        <div class="excel-status" id="excelStatus">nenhum arquivo carregado ainda</div>
+      </div>
+
+      <div class="score-bottom-row">
         <div class="score-badge" id="scoreDoneBadge">0 concluídos</div>
         <div class="score-badge" id="scoreFailedBadge">0 não cumpridos</div>
       </div>
-    </div>
-
-    <div class="excel-row">
-      <label class="excel-btn primary" id="importBtn">
-        ⬆ Carregar do Excel
-        <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none;">
-      </label>
-      <div class="excel-btn" id="exportBtn">⬇ Salvar offline</div>
-      <div class="excel-status" id="excelStatus">nenhum arquivo carregado ainda</div>
     </div>
 
     <div class="page active" id="page-objetivos">
