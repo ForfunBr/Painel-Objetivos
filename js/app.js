@@ -1050,7 +1050,7 @@
     if (targetPage) targetPage.classList.add('active');
 
     const banner = document.querySelector('.score-banner');
-    if (banner) banner.style.display = pageName === 'score' ? 'none' : 'flex';
+    if (banner) banner.style.display = pageName === 'score' ? 'none' : 'block';
   }
 
   document.querySelectorAll('.tab').forEach(tab => {
