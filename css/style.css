@@ -811,3 +811,30 @@ html, body {
     font-family: 'IBM Plex Mono', monospace;
     margin-top: 8px;
   }
+
+  /* ============ RESPONSIVE: mobile fine-tuning (default layout stays as-is) ============ */
+  @media (max-width: 600px) {
+    .score-corner-btn { width: 110px; }
+    .score-banner { padding: 54px 12px 60px; }
+    .score-bottom-row { left: 12px; right: 12px; flex-direction: column; gap: 8px; align-items: flex-start; }
+    .fab-popup { width: min(260px, calc(100vw - 64px)); }
+    .chart-host { overflow-x: auto; }
+    .chart-col { flex: none; width: 46px; }
+    .bottom-tabs .tab { padding: 9px 14px; font-size: 12.5px; }
+    .item-row { flex-wrap: wrap; row-gap: 6px; }
+    .header-banner { height: 130px; }
+  }
+
+  /* ============ RESPONSIVE: desktop layout (side-by-side columns) ============ */
+  @media (min-width: 1000px) {
+    .wrap { max-width: 1400px; }
+    #sectionsHost {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+    .score-corner-btn { width: 170px; }
+    .score-value { font-size: 56px; }
+    .header-banner { height: 220px; }
+  }
