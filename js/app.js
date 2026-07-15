@@ -301,13 +301,97 @@
     return copy;
   }
 
+  let expandedDone = new Set();
+
+  function toggleDoneSection(catKey) {
+    if (expandedDone.has(catKey)) expandedDone.delete(catKey);
+    else expandedDone.add(catKey);
+    render();
+  }
+
+  function buildItemRow(o, cat) {
+    const row = document.createElement('div');
+    row.className = 'item-row';
+
+    const box = document.createElement('div');
+    box.className = 'checkbox' + (o.done ? ' checked' : '');
+    box.innerHTML = checkSvg();
+    box.onclick = () => toggleObjective(o.id);
+
+    const txt = document.createElement('div');
+    txt.className = 'item-text' + (o.done ? ' done' : '');
+    txt.textContent = o.text;
+    txt.onclick = () => toggleObjective(o.id);
+
+    row.appendChild(box);
+    row.appendChild(txt);
+
+    const meta = document.createElement('div');
+    meta.className = 'item-meta';
+
+    if (o.priority) {
+      const pcfg = PRIORITIES.find(p => p.key === o.priority);
+      if (pcfg) {
+        const pbadge = document.createElement('div');
+        pbadge.className = 'priority-badge ' + pcfg.key;
+        pbadge.textContent = pcfg.label;
+        meta.appendChild(pbadge);
+      }
+    }
+
+    if (o.dueDate) {
+      const badge = document.createElement('div');
+      badge.className = 'due-badge' + dueBadgeClass(o.dueDate, o.done);
+      badge.textContent = '📅 ' + formatDate(o.dueDate);
+      meta.appendChild(badge);
+    }
+
+    if (o.failed) {
+      const fbadge = document.createElement('div');
+      fbadge.className = 'failed-badge';
+      fbadge.textContent = '⚠ Não cumprido';
+      meta.appendChild(fbadge);
+    } else if (o.autoPenalized) {
+      const pbadge2 = document.createElement('div');
+      pbadge2.className = 'penalty-tag';
+      pbadge2.textContent = '−' + pointsFor(o.priority) + ' (prazo vencido)';
+      meta.appendChild(pbadge2);
+    }
+
+    row.appendChild(meta);
+
+    const edit = document.createElement('div');
+    edit.className = 'edit-btn';
+    edit.textContent = '✎';
+    edit.onclick = () => { editingId = o.id; render(); };
+
+    const fail = document.createElement('div');
+    fail.className = 'fail-btn' + (o.failed ? ' active' : '');
+    fail.textContent = '⚠';
+    fail.title = o.failed ? 'Desmarcar como não cumprido' : 'Marcar como não cumprido';
+    fail.onclick = () => toggleFailed(o.id);
+
+    const del = document.createElement('div');
+    del.className = 'del-btn';
+    del.textContent = '✕';
+    del.onclick = () => deleteObjective(o.id);
+
+    row.appendChild(edit);
+    row.appendChild(fail);
+    row.appendChild(del);
+    return row;
+  }
+
   function renderSections() {
     const host = document.getElementById('sectionsHost');
     host.innerHTML = '';
     CATEGORIES.forEach(cat => {
       const rawItems = objectives.filter(o => o.category === cat.key);
-      const items = partitionDoneLast(sortItems(rawItems, cat.key));
-      const doneCount = items.filter(o => o.done).length;
+      const sorted = sortItems(rawItems, cat.key);
+      const openItems = sorted.filter(o => !o.done);
+      const doneItems = sorted.filter(o => o.done);
+      const totalCount = sorted.length;
+      const doneCount = doneItems.length;
 
       const section = document.createElement('div');
       section.className = 'section';
@@ -341,90 +425,52 @@
 
       const countTag = document.createElement('div');
       countTag.className = 'count-tag';
-      countTag.textContent = doneCount + '/' + items.length;
+      countTag.textContent = doneCount + '/' + totalCount;
       headRight.appendChild(countTag);
 
       head.appendChild(headRight);
       section.appendChild(head);
 
-      if (items.length === 0) {
+      if (totalCount === 0) {
         const hint = document.createElement('div');
         hint.className = 'empty-hint';
         hint.textContent = 'Nenhum item ainda. Adicione o primeiro objetivo abaixo.';
         section.appendChild(hint);
       } else {
-        items.forEach(o => {
-          if (editingId === o.id) {
-            section.appendChild(buildEditRow(o, cat));
-            return;
-          }
-
-          const row = document.createElement('div');
-          row.className = 'item-row';
-
-          const box = document.createElement('div');
-          box.className = 'checkbox' + (o.done ? ' checked' : '');
-          box.innerHTML = checkSvg();
-          box.onclick = () => toggleObjective(o.id);
-
-          const txt = document.createElement('div');
-          txt.className = 'item-text' + (o.done ? ' done' : '');
-          txt.textContent = o.text;
-          txt.onclick = () => toggleObjective(o.id);
-
-          row.appendChild(box);
-          row.appendChild(txt);
-
-          if (o.priority) {
-            const pcfg = PRIORITIES.find(p => p.key === o.priority);
-            if (pcfg) {
-              const pbadge = document.createElement('div');
-              pbadge.className = 'priority-badge ' + pcfg.key;
-              pbadge.textContent = pcfg.label;
-              row.appendChild(pbadge);
+        if (openItems.length === 0) {
+          const hint = document.createElement('div');
+          hint.className = 'empty-hint';
+          hint.textContent = 'Nenhum item em aberto nesta lista.';
+          section.appendChild(hint);
+        } else {
+          openItems.forEach(o => {
+            if (editingId === o.id) {
+              section.appendChild(buildEditRow(o, cat));
+            } else {
+              section.appendChild(buildItemRow(o, cat));
             }
-          }
+          });
+        }
 
-          if (o.dueDate) {
-            const badge = document.createElement('div');
-            badge.className = 'due-badge' + dueBadgeClass(o.dueDate, o.done);
-            badge.textContent = '📅 ' + formatDate(o.dueDate);
-            row.appendChild(badge);
-          }
+        if (doneItems.length > 0) {
+          const isExpanded = expandedDone.has(cat.key);
+          const toggle = document.createElement('div');
+          toggle.className = 'done-toggle' + (isExpanded ? ' expanded' : '');
+          toggle.innerHTML = '<span class="done-toggle-arrow">▶</span> Concluídos (' + doneItems.length + ')';
+          toggle.onclick = () => toggleDoneSection(cat.key);
+          section.appendChild(toggle);
 
-          if (o.failed) {
-            const fbadge = document.createElement('div');
-            fbadge.className = 'failed-badge';
-            fbadge.textContent = '⚠ Não cumprido';
-            row.appendChild(fbadge);
-          } else if (o.autoPenalized) {
-            const pbadge2 = document.createElement('div');
-            pbadge2.className = 'penalty-tag';
-            pbadge2.textContent = '−' + pointsFor(o.priority) + ' (prazo vencido)';
-            row.appendChild(pbadge2);
-          }
-
-          const edit = document.createElement('div');
-          edit.className = 'edit-btn';
-          edit.textContent = '✎';
-          edit.onclick = () => { editingId = o.id; render(); };
-
-          const fail = document.createElement('div');
-          fail.className = 'fail-btn' + (o.failed ? ' active' : '');
-          fail.textContent = '⚠';
-          fail.title = o.failed ? 'Desmarcar como não cumprido' : 'Marcar como não cumprido';
-          fail.onclick = () => toggleFailed(o.id);
-
-          const del = document.createElement('div');
-          del.className = 'del-btn';
-          del.textContent = '✕';
-          del.onclick = () => deleteObjective(o.id);
-
-          row.appendChild(edit);
-          row.appendChild(fail);
-          row.appendChild(del);
-          section.appendChild(row);
-        });
+          const doneWrap = document.createElement('div');
+          doneWrap.className = 'done-items-wrap' + (isExpanded ? ' expanded' : '');
+          doneItems.forEach(o => {
+            if (editingId === o.id) {
+              doneWrap.appendChild(buildEditRow(o, cat));
+            } else {
+              doneWrap.appendChild(buildItemRow(o, cat));
+            }
+          });
+          section.appendChild(doneWrap);
+        }
       }
 
       host.appendChild(section);

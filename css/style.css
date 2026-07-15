@@ -171,11 +171,44 @@ html, body {
 
   .item-text {
     flex: 1;
+    min-width: 0;
+    text-align: left;
     font-size: 14px;
     cursor: pointer;
     line-height: 1.4;
   }
   .item-text.done { color: var(--muted); text-decoration: line-through; }
+
+  .item-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    flex: none;
+  }
+
+  .done-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 4px;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 12.5px;
+    font-family: 'IBM Plex Mono', monospace;
+    user-select: none;
+    border-top: 1px solid var(--line);
+    margin-top: 4px;
+  }
+  .done-toggle:hover { color: var(--text); }
+  .done-toggle-arrow {
+    display: inline-block;
+    transition: transform .15s ease;
+    font-size: 10px;
+  }
+  .done-toggle.expanded .done-toggle-arrow { transform: rotate(90deg); }
+  .done-items-wrap { display: none; }
+  .done-items-wrap.expanded { display: block; }
 
   .due-badge {
     font-family: 'IBM Plex Mono', monospace;
