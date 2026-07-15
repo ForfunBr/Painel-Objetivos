@@ -100,9 +100,9 @@
     }
   }
 
-  function addObjective(catKey, text, dueDate, priority) {
+  function addObjective(catKey, text, dueDate, priority, description) {
     if (!text.trim()) return;
-    objectives.push({ id: uid(), category: catKey, text: text.trim(), done: false, createdAt: Date.now(), dueDate: dueDate || null, priority: priority || '', failed: false, autoPenalized: false });
+    objectives.push({ id: uid(), category: catKey, text: text.trim(), description: (description || '').trim(), done: false, createdAt: Date.now(), dueDate: dueDate || null, priority: priority || '', failed: false, autoPenalized: false });
     save();
     render();
   }
@@ -182,7 +182,7 @@
     return '<svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#0e1210" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   }
 
-  function saveEditedObjective(id, newText, newPriority, newDueDate) {
+  function saveEditedObjective(id, newText, newPriority, newDueDate, newDescription) {
     const o = objectives.find(x => x.id === id);
     if (o && newText.trim()) {
       const oldPriority = o.priority;
@@ -211,6 +211,7 @@
       }
 
       o.text = label;
+      o.description = (newDescription || '').trim();
       o.priority = nextPriority;
       o.dueDate = nextDueDate;
       save();
@@ -231,6 +232,12 @@
     const input = document.createElement('input');
     input.type = 'text';
     input.value = o.text;
+    input.placeholder = 'Título do objetivo';
+
+    const descInput = document.createElement('textarea');
+    descInput.rows = 2;
+    descInput.placeholder = 'Descrição (opcional)...';
+    descInput.value = o.description || '';
 
     const prioritySelect = document.createElement('select');
     const noneOpt = document.createElement('option');
@@ -250,7 +257,7 @@
     dateInput.value = o.dueDate || '';
     dateInput.title = 'Prazo de conclusão';
 
-    const doSave = () => saveEditedObjective(o.id, input.value, prioritySelect.value, dateInput ? dateInput.value : null);
+    const doSave = () => saveEditedObjective(o.id, input.value, prioritySelect.value, dateInput ? dateInput.value : null, descInput.value);
     input.onkeydown = (e) => {
       if (e.key === 'Enter') doSave();
       if (e.key === 'Escape') cancelEdit();
@@ -271,6 +278,7 @@
     row.appendChild(prioritySelect);
     row.appendChild(saveBtn);
     row.appendChild(cancelBtn);
+    row.appendChild(descInput);
     return row;
   }
 
@@ -303,9 +311,15 @@
 
   let expandedDone = new Set();
   let openMenuId = null;
+  let descOpenId = null;
 
   function toggleRowMenu(id) {
     openMenuId = (openMenuId === id) ? null : id;
+    render();
+  }
+
+  function toggleDesc(id) {
+    descOpenId = (descOpenId === id) ? null : id;
     render();
   }
 
@@ -325,9 +339,19 @@
     box.onclick = () => toggleObjective(o.id);
 
     const txt = document.createElement('div');
-    txt.className = 'item-text' + (o.done ? ' done' : '');
+    txt.className = 'item-text' + (o.done ? ' done' : '') + (o.description ? ' has-desc' : '');
     txt.textContent = o.text;
-    txt.onclick = () => toggleObjective(o.id);
+
+    if (o.description) {
+      txt.classList.add('desc-trigger');
+      txt.onclick = (e) => { e.stopPropagation(); toggleDesc(o.id); };
+
+      const popover = document.createElement('div');
+      popover.className = 'item-desc-popover' + (descOpenId === o.id ? ' open' : '');
+      popover.textContent = o.description;
+      popover.onclick = (e) => e.stopPropagation();
+      txt.appendChild(popover);
+    }
 
     row.appendChild(box);
     row.appendChild(txt);
@@ -870,6 +894,7 @@
       return {
         'Categoria': cat ? cat.label : o.category,
         'Tarefa': o.text,
+        'Descrição': o.description || '',
         'Concluída': o.done ? 'Sim' : 'Não',
         'Prazo': o.dueDate || '',
         'Prioridade': priorityKeyToLabel(o.priority),
@@ -879,8 +904,8 @@
         'Penalizado automaticamente': o.autoPenalized ? 'Sim' : 'Não',
       };
     });
-    const ws = XLSX.utils.json_to_sheet(rows, { header: ['Categoria', 'Tarefa', 'Concluída', 'Prazo', 'Prioridade', 'Criado em', 'Concluído em', 'Não cumprido', 'Penalizado automaticamente'] });
-    ws['!cols'] = [{ wch: 32 }, { wch: 50 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 22 }, { wch: 22 }, { wch: 14 }, { wch: 22 }];
+    const ws = XLSX.utils.json_to_sheet(rows, { header: ['Categoria', 'Tarefa', 'Descrição', 'Concluída', 'Prazo', 'Prioridade', 'Criado em', 'Concluído em', 'Não cumprido', 'Penalizado automaticamente'] });
+    ws['!cols'] = [{ wch: 32 }, { wch: 50 }, { wch: 50 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 22 }, { wch: 22 }, { wch: 14 }, { wch: 22 }];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Objetivos');
 
@@ -953,6 +978,7 @@
           id: uid(),
           category: catLabelToKey(r['Categoria']),
           text: (r['Tarefa'] || '').toString().trim(),
+          description: (r['Descrição'] || '').toString().trim(),
           done: isDone,
           createdAt: isNaN(parsed) ? Date.now() : parsed,
           dueDate: prazoRaw || null,
@@ -1048,6 +1074,7 @@
     const fabClose = document.getElementById('fabClose');
     const fabCategory = document.getElementById('fabCategory');
     const fabText = document.getElementById('fabText');
+    const fabDescription = document.getElementById('fabDescription');
     const fabDate = document.getElementById('fabDate');
     const fabPriority = document.getElementById('fabPriority');
     const fabAddBtn = document.getElementById('fabAddBtn');
@@ -1091,9 +1118,10 @@
 
     function doFabAdd() {
       if (!fabText.value.trim()) { fabText.focus(); return; }
-      addObjective(fabCategory.value, fabText.value, fabDate.value, fabPriority.value);
+      addObjective(fabCategory.value, fabText.value, fabDate.value, fabPriority.value, fabDescription.value);
       fabText.value = '';
       fabDate.value = '';
+      fabDescription.value = '';
       fabText.focus();
     }
 
@@ -1128,7 +1156,10 @@
   document.getElementById('headerBanner').onclick = () => switchToTab('objetivos');
 
   document.addEventListener('click', () => {
-    if (openMenuId !== null) { openMenuId = null; render(); }
+    let changed = false;
+    if (openMenuId !== null) { openMenuId = null; changed = true; }
+    if (descOpenId !== null) { descOpenId = null; changed = true; }
+    if (changed) render();
   });
 
   load();

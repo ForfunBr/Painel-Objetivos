@@ -179,6 +179,38 @@ html, body {
   }
   .item-text.done { color: var(--muted); text-decoration: line-through; }
 
+  .item-text.desc-trigger {
+    position: relative;
+    cursor: pointer;
+    border-bottom: 1px dotted var(--muted);
+    display: inline-block;
+    max-width: 100%;
+  }
+  .item-text.desc-trigger:hover .item-desc-popover,
+  .item-desc-popover.open {
+    display: block;
+  }
+  .item-desc-popover {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 35;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text);
+    font-weight: 400;
+    text-decoration: none;
+    white-space: normal;
+    width: max-content;
+    max-width: 320px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+
   .item-meta {
     display: flex;
     align-items: center;
@@ -355,6 +387,20 @@ html, body {
     outline: none;
     font-family: inherit;
   }
+  .edit-row textarea {
+    flex-basis: 100%;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 40px;
+  }
+  .edit-row textarea:focus { border-color: var(--amber); }
   .edit-row select,
   .edit-row input[type="date"] {
     flex: none;
@@ -810,6 +856,7 @@ html, body {
   }
   .fab-field:focus { border-color: var(--amber); }
   select.fab-field { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; cursor: pointer; }
+  .fab-textarea { resize: vertical; min-height: 44px; font-family: inherit; line-height: 1.4; }
 
   .fab-add-btn {
     background: var(--amber);
