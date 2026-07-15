@@ -289,27 +289,48 @@ html, body {
   .sort-opt.active { background: var(--amber); color: #17142c; font-weight: 600; }
   .sort-opt:not(.active):hover { color: var(--text); }
 
-  .del-btn {
-    color: var(--muted);
-    opacity: 0;
-    cursor: pointer;
-    font-size: 13px;
-    padding: 4px 6px;
-    transition: opacity .12s, color .12s;
+  .row-menu {
+    position: relative;
+    flex: none;
+    margin-left: 4px;
   }
-  .item-row:hover .del-btn { opacity: 1; }
-  .del-btn:hover { color: var(--danger); }
+  .row-menu-btn {
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    line-height: 1;
+    transition: background .12s, color .12s;
+  }
+  .row-menu-btn:hover, .row-menu-btn.active { color: var(--text); background: var(--panel-2); }
 
-  .edit-btn {
-    color: var(--muted);
-    opacity: 0;
-    cursor: pointer;
-    font-size: 13px;
-    padding: 4px 6px;
-    transition: opacity .12s, color .12s;
+  .row-menu-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 6px;
+    min-width: 190px;
+    z-index: 30;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
   }
-  .item-row:hover .edit-btn { opacity: 1; }
-  .edit-btn:hover { color: var(--amber); }
+  .row-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .row-menu-item:hover { background: var(--panel); }
+  .row-menu-item.danger:hover { color: var(--danger); }
+  .row-menu-item.active-state { color: var(--danger); }
 
   .edit-row {
     display: flex;
@@ -647,18 +668,6 @@ html, body {
     color: var(--danger);
     white-space: nowrap;
   }
-
-  .fail-btn {
-    color: var(--muted);
-    opacity: 0;
-    cursor: pointer;
-    font-size: 14px;
-    padding: 4px 6px;
-    transition: opacity .12s, color .12s;
-  }
-  .item-row:hover .fail-btn { opacity: 1; }
-  .fail-btn:hover { color: var(--danger); }
-  .fail-btn.active { opacity: 1; color: var(--danger); }
 
   .score-mega-card {
     text-align: center;

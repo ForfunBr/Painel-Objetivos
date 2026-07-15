@@ -302,6 +302,12 @@
   }
 
   let expandedDone = new Set();
+  let openMenuId = null;
+
+  function toggleRowMenu(id) {
+    openMenuId = (openMenuId === id) ? null : id;
+    render();
+  }
 
   function toggleDoneSection(catKey) {
     if (expandedDone.has(catKey)) expandedDone.delete(catKey);
@@ -360,25 +366,41 @@
 
     row.appendChild(meta);
 
-    const edit = document.createElement('div');
-    edit.className = 'edit-btn';
-    edit.textContent = '✎';
-    edit.onclick = () => { editingId = o.id; render(); };
+    const menu = document.createElement('div');
+    menu.className = 'row-menu';
 
-    const fail = document.createElement('div');
-    fail.className = 'fail-btn' + (o.failed ? ' active' : '');
-    fail.textContent = '⚠';
-    fail.title = o.failed ? 'Desmarcar como não cumprido' : 'Marcar como não cumprido';
-    fail.onclick = () => toggleFailed(o.id);
+    const menuBtn = document.createElement('div');
+    menuBtn.className = 'row-menu-btn' + (openMenuId === o.id ? ' active' : '');
+    menuBtn.textContent = '⋮';
+    menuBtn.onclick = (e) => { e.stopPropagation(); toggleRowMenu(o.id); };
+    menu.appendChild(menuBtn);
 
-    const del = document.createElement('div');
-    del.className = 'del-btn';
-    del.textContent = '✕';
-    del.onclick = () => deleteObjective(o.id);
+    if (openMenuId === o.id) {
+      const dropdown = document.createElement('div');
+      dropdown.className = 'row-menu-dropdown';
 
-    row.appendChild(edit);
-    row.appendChild(fail);
-    row.appendChild(del);
+      const editItem = document.createElement('div');
+      editItem.className = 'row-menu-item';
+      editItem.innerHTML = '✎ Editar';
+      editItem.onclick = (e) => { e.stopPropagation(); openMenuId = null; editingId = o.id; render(); };
+      dropdown.appendChild(editItem);
+
+      const failItem = document.createElement('div');
+      failItem.className = 'row-menu-item' + (o.failed ? ' active-state' : '');
+      failItem.innerHTML = o.failed ? '⚠ Desmarcar não cumprido' : '⚠ Marcar como não cumprido';
+      failItem.onclick = (e) => { e.stopPropagation(); openMenuId = null; toggleFailed(o.id); };
+      dropdown.appendChild(failItem);
+
+      const delItem = document.createElement('div');
+      delItem.className = 'row-menu-item danger';
+      delItem.innerHTML = '✕ Apagar objetivo';
+      delItem.onclick = (e) => { e.stopPropagation(); openMenuId = null; deleteObjective(o.id); };
+      dropdown.appendChild(delItem);
+
+      menu.appendChild(dropdown);
+    }
+
+    row.appendChild(menu);
     return row;
   }
 
@@ -1104,6 +1126,10 @@
   });
 
   document.getElementById('headerBanner').onclick = () => switchToTab('objetivos');
+
+  document.addEventListener('click', () => {
+    if (openMenuId !== null) { openMenuId = null; render(); }
+  });
 
   load();
 })();
