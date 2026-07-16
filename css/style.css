@@ -906,6 +906,7 @@ html, body {
     font-family: 'IBM Plex Mono', monospace;
     margin-top: 8px;
   }
+  .excel-status-desktop { display: none; }
 
   /* ============ RESPONSIVE: mobile fine-tuning (default layout stays as-is) ============ */
   @media (max-width: 600px) {
@@ -948,11 +949,7 @@ html, body {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+      width: 150px;
     }
     .score-left-group .score-corner-btn {
       position: static;
@@ -963,17 +960,19 @@ html, body {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 12px;
-      padding: 18px 22px;
+      padding: 10px 20px;
       box-shadow: 0 6px 16px rgba(0,0,0,0.4);
       cursor: pointer;
       transition: transform .15s ease, border-color .15s ease;
+      width: fit-content;
     }
     .score-right-group:hover { transform: scale(1.02); border-color: var(--amber); }
     .score-right-group .score-banner-center { position: static; }
+    .score-right-group #excelStatus { display: none; }
     .score-right-group .score-bottom-row {
       position: static;
       left: auto;
@@ -983,7 +982,17 @@ html, body {
       gap: 12px;
     }
 
+    #subtitleText { display: none; }
+    .excel-status-desktop {
+      display: block;
+      font-size: 10.5px;
+      line-height: 1.4;
+      white-space: normal;
+      word-break: break-word;
+      width: 150px;
+      margin-top: 2px;
+    }
+
     .score-corner-btn { width: 170px; }
     .score-value { font-size: 56px; }
-    .header-banner { height: 220px; }
   }

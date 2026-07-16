@@ -874,6 +874,8 @@
 
   function setStatus(msg) {
     document.getElementById('excelStatus').textContent = msg;
+    const desktopEl = document.getElementById('excelStatusDesktop');
+    if (desktopEl) desktopEl.textContent = msg;
   }
 
   function priorityKeyToLabel(key) {
