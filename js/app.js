@@ -1146,7 +1146,7 @@
     if (targetPage) targetPage.classList.add('active');
 
     const banner = document.querySelector('.score-banner');
-    if (banner) banner.style.display = pageName === 'score' ? 'none' : 'block';
+    if (banner) banner.style.display = pageName === 'score' ? 'none' : '';
   }
 
   document.querySelectorAll('.tab').forEach(tab => {
@@ -1154,6 +1154,11 @@
   });
 
   document.getElementById('headerBanner').onclick = () => switchToTab('objetivos');
+
+  document.getElementById('scoreRightGroup').onclick = () => {
+    // Only active in the desktop rearranged layout; mobile keeps its current behavior untouched.
+    if (window.innerWidth >= 1000) switchToTab('score');
+  };
 
   document.addEventListener('click', () => {
     let changed = false;

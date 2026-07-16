@@ -9,9 +9,37 @@
 <body>
 <div id="root">
   <div class="wrap">
-    <div class="top">
-      <img src="banner.jpg" alt="Painel de Objetivos" class="header-banner" id="headerBanner" title="Voltar para Objetivos">
-      <div class="subtitle" id="subtitleText">carregando...</div>
+    <div class="header-grid">
+      <div class="top">
+        <img src="banner.jpg" alt="Painel de Objetivos" class="header-banner" id="headerBanner" title="Voltar para Objetivos">
+        <div class="subtitle" id="subtitleText">carregando...</div>
+      </div>
+
+      <div class="score-banner" id="scoreBannerBox">
+        <div class="score-left-group">
+          <label class="score-corner-btn score-corner-left" id="importBtn" title="Carregar do Excel">
+            <img src="upload-btn.png" alt="Carregar do Excel">
+            <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none;">
+          </label>
+
+          <div class="score-corner-btn score-corner-right" id="exportBtn" title="Salvar offline">
+            <img src="download-btn.png" alt="Salvar offline">
+          </div>
+        </div>
+
+        <div class="score-right-group" id="scoreRightGroup">
+          <div class="score-banner-center">
+            <div class="score-label">Pontuação Atual</div>
+            <div class="score-value" id="scoreValue">1000</div>
+            <div class="excel-status" id="excelStatus">nenhum arquivo carregado ainda</div>
+          </div>
+
+          <div class="score-bottom-row">
+            <div class="score-badge" id="scoreDoneBadge">0 concluídos</div>
+            <div class="score-badge" id="scoreFailedBadge">0 não cumpridos</div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="bottom-tabs">
@@ -20,30 +48,9 @@
       <div class="tab" data-page="score">SCORE</div>
     </div>
 
-    <div class="score-banner">
-      <label class="score-corner-btn score-corner-left" id="importBtn" title="Carregar do Excel">
-        <img src="upload-btn.png" alt="Carregar do Excel">
-        <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none;">
-      </label>
-
-      <div class="score-corner-btn score-corner-right" id="exportBtn" title="Salvar offline">
-        <img src="download-btn.png" alt="Salvar offline">
-      </div>
-
-      <div class="score-banner-center">
-        <div class="score-label">Pontuação Atual</div>
-        <div class="score-value" id="scoreValue">1000</div>
-        <div class="excel-status" id="excelStatus">nenhum arquivo carregado ainda</div>
-      </div>
-
-      <div class="score-bottom-row">
-        <div class="score-badge" id="scoreDoneBadge">0 concluídos</div>
-        <div class="score-badge" id="scoreFailedBadge">0 não cumpridos</div>
-      </div>
-    </div>
-
     <div class="page active" id="page-objetivos">
       <div id="sectionsHost"></div>
+
 
       <div class="fab-container">
         <div class="fab-popup" id="fabPopup">

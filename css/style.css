@@ -649,6 +649,10 @@ html, body {
   .score-corner-left { left: 16px; }
   .score-corner-right { right: 16px; }
 
+  /* Default (mobile/tablet): these wrappers stay invisible so buttons/score
+     keep positioning exactly as before, relative to .score-banner itself. */
+  .score-left-group, .score-right-group { display: contents; }
+
   .score-banner-center {
     display: flex;
     flex-direction: column;
@@ -926,6 +930,59 @@ html, body {
       gap: 18px;
       align-items: start;
     }
+
+    .header-grid {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .top { order: 2; margin-bottom: 0; }
+    .score-banner {
+      display: contents;
+      margin-bottom: 0;
+    }
+    .score-left-group {
+      order: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+    }
+    .score-left-group .score-corner-btn {
+      position: static;
+      width: 150px;
+    }
+    .score-right-group {
+      order: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 18px 22px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+      cursor: pointer;
+      transition: transform .15s ease, border-color .15s ease;
+    }
+    .score-right-group:hover { transform: scale(1.02); border-color: var(--amber); }
+    .score-right-group .score-banner-center { position: static; }
+    .score-right-group .score-bottom-row {
+      position: static;
+      left: auto;
+      right: auto;
+      bottom: auto;
+      justify-content: center;
+      gap: 12px;
+    }
+
     .score-corner-btn { width: 170px; }
     .score-value { font-size: 56px; }
     .header-banner { height: 220px; }
