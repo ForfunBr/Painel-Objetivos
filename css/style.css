@@ -934,6 +934,7 @@ html, body {
 
     .header-grid {
       display: grid;
+      grid-auto-flow: dense;
       grid-template-columns: auto 1fr auto;
       align-items: center;
       gap: 20px;
